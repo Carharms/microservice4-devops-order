@@ -1,33 +1,29 @@
-FROM node:18-alpine
+# Stage 1: Build Stage
+# Use a Node.js base image to install dependencies
+FROM node:18-alpine AS builder
 
-# Create app directory
 WORKDIR /app
 
-# Copy package files
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nodejs -u 1001
+# Stage 2: Production Stage
+# Use a lean Node.js base image for the final production container
+FROM node:18-alpine
 
-# Copy source code
+WORKDIR /app
+
+# Copy only the installed dependencies from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy the application source code
 COPY . .
-RUN chown -R nodejs:nodejs /app
 
-# Switch to non-root user
-USER nodejs
+# Expose the port the app runs on
+EXPOSE 3001
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "const http = require('http'); \
-    const options = { hostname: 'localhost', port: 3002, path: '/health', timeout: 2000 }; \
-    const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); \
-    req.on('error', () => process.exit(1)); \
-    req.end();"
-
-EXPOSE 3002
-
-CMD ["npm", "start"]
+# Define the command to run the application
+CMD ["node", "index.js"]
