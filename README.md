@@ -12,7 +12,11 @@ Order management microservice for the e-commerce platform. Handles order creatio
 
 ### Local Development
 
-1. Clone or fork this repothe repository:
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd order-service
+```
 
 2. Install dependencies:
 ```bash
@@ -140,4 +144,3 @@ Application logs are written to stdout and can be collected by container orchest
 3. Submit pull request
 4. Pipeline must pass all stages
 5. Code review required before merge
-
