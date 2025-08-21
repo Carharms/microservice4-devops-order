@@ -12,11 +12,7 @@ Order management microservice for the e-commerce platform. Handles order creatio
 
 ### Local Development
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd order-service
-```
+1. Clone or fork this repothe repository:
 
 2. Install dependencies:
 ```bash
