@@ -145,3 +145,4 @@ Application logs are written to stdout and can be collected by container orchest
 4. Pipeline must pass all stages
 5. Code review required before merge
 
+docker run -d --name sonarqube -p 9000:9000 sonarqube:lts
