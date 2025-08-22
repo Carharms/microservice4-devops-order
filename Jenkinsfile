@@ -1,13 +1,17 @@
 pipeline {
     agent any
+
+    triggers {
+        // Webhook triggers for different events
+        githubPush()
+        pullRequest()
+    }
     
     environment {
         DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'
-=======
         DOCKER_IMAGE_NAME = 'carharms/order-service'
         IMAGE_TAG = "${BUILD_NUMBER}"
         SONAR_PROJECT_KEY = 'order-service'
->>>>>>> master
         // SONAR_HOST_URL = 'http://localhost:9000'
         // SONAR_AUTH_TOKEN
         
