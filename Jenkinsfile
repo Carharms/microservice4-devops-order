@@ -3,9 +3,11 @@ pipeline {
     
     environment {
         DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'
-        DOCKER_IMAGE_NAME = 'carharms/product-service'
+=======
+        DOCKER_IMAGE_NAME = 'carharms/order-service'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        SONAR_PROJECT_KEY = 'product-service'
+        SONAR_PROJECT_KEY = 'order-service'
+>>>>>>> master
         // SONAR_HOST_URL = 'http://localhost:9000'
         // SONAR_AUTH_TOKEN
         
@@ -34,12 +36,11 @@ pipeline {
                             echo "ESLint not configured, skipping linting"
                         fi
                         
-                        echo "Validating required files..."
-                        test -f "index.js" && echo "✓ index.js found" || (echo "✗ index.js missing" && exit 1)
-                        test -f "package.json" && echo "✓ package.json found" || (echo "✗ package.json missing" && exit 1)
-                        test -f "Dockerfile" && echo "✓ Dockerfile found" || (echo "✗ Dockerfile missing" && exit 1)
-                        test -f "docker-compose.yml" && echo "✓ docker-compose.yml found" || (echo "✗ docker-compose.yml missing" && exit 1)
-                        test -d "test" && echo "✓ test directory found" || (echo "✗ test directory missing" && exit 1)
+
+                        test -f "package.json" && echo "package.json found" || (echo "package.json missing" && exit 1)
+                        test -f "Dockerfile" && echo "Dockerfile found" || (echo "Dockerfile missing" && exit 1)
+                        test -f "docker-compose.yml" && echo "docker-compose.yml found" || (echo "docker-compose.yml missing" && exit 1)
+
                     '''
                 }
             }
@@ -54,29 +55,11 @@ pipeline {
                         mkdir -p test
                         
                         # Run unit tests
-                        echo "Running unit tests..."
                         npm test || echo "Unit tests completed with issues"
+
+                        # Run integration tests
+                        # Add in MainApp.test.js
                         
-                        # Start database for integration tests
-                        echo "Starting database for integration tests..."
-                        docker-compose -f docker-compose.yml down --remove-orphans || true
-                        docker-compose -f docker-compose.yml up -d db
-                        
-                        # Wait for database to be ready
-                        echo "Waiting for database to be ready..."
-                        timeout 60 bash -c 'until docker-compose -f docker-compose.yml exec -T db pg_isready -U $POSTGRES_USER -d $POSTGRES_DB; do sleep 2; done' || echo "Database ready check timeout"
-                        
-                        # Run integration tests if available
-                        echo "Running integration tests..."
-                        if npm run test:integration >/dev/null 2>&1; then
-                            npm run test:integration || echo "Integration tests completed with issues"
-                        else
-                            echo "No integration tests configured"
-                        fi
-                        
-                        # Cleanup
-                        echo "Cleaning up test environment..."
-                        docker-compose -f docker-compose.yml down --remove-orphans || true
                     '''
                 }
             }

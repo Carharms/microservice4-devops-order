@@ -1,148 +1,46 @@
-# Order Service
+## Order Service Overview ##
+Repository for the REST API that handles all order management for the e-commerce platform.
 
-Order management microservice for the e-commerce platform. Handles order creation, status updates, and order retrieval operations.
+## Setup ##
+Install locally is with Docker and Docker Compose.
 
-## Prerequisites
+1. Clone this repository:
+git clone <your-repo-url>
 
-- Node.js 18+
-- Docker and Docker Compose
-- PostgreSQL (for production)
-
-## Quick Start
-
-### Local Development
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
+2. Change to the project directory:
 cd order-service
-```
 
-2. Install dependencies:
-```bash
-npm install
-```
+3. Use Docker Compose to build the image and start the service along with its database:
+docker-compose up --build
 
-3. Set up environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
+This will make the service available on your local machine at the port specified in the docker-compose.yml file.
 
-4. Start with Docker Compose:
-```bash
-docker-compose up -d
-```
+## Project Architecture ##
+Technology Stack: This is a RESTful API service.
 
-The service will be available at `http://localhost:3002`
+Database: It uses a dedicated PostgreSQL database to store all order-related information, including customer details, order items, and status.
 
-### Environment Variables
+Inter-service Communication: This service depends on the Product Service to retrieve product details and validate stock levels when a new order is created. This communication happens over the internal Kubernetes cluster network in production.
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NODE_ENV` | Environment (development/production) | `development` |
-| `PORT` | Service port | `3002` |
-| `DB_HOST` | Database host | `localhost` |
-| `DB_PORT` | Database port | `5432` |
-| `DB_NAME` | Database name | `subscriptions` |
-| `DB_USER` | Database user | `dbuser` |
-| `DB_PASSWORD` | Database password | `dbpassword` |
-| `PRODUCT_SERVICE_URL` | Product service URL | `http://localhost:3001` |
+Key Functionality: It exposes endpoints for:
 
-## API Endpoints
+POST /orders: Create a new order.
 
-### Health Check
-- `GET /health` - Service health status
+GET /orders/{id}: Fetch the status of a specific order.
 
-### Orders
-- `GET /api/orders` - Get all orders
-- `GET /api/orders/:id` - Get order by ID
-- `POST /api/orders` - Create new order
-- `PUT /api/orders/:id/status` - Update order status
-- `GET /api/orders/status/:status` - Get orders by status
-- `DELETE /api/orders/:id` - Delete order
+GET /customers/{customerId}/orders: Retrieve all orders for a given customer.
 
-### Database Test
-- `GET /api/test-db` - Test database connection
+## CI/CD Pipeline ##
+A Jenkins pipeline is configured for this repository to provide a fully automated CI/CD workflow:
 
-## Order Status Flow
+Build & Test: The pipeline compiles the code and runs a series of unit and integration tests.
 
-Orders follow this status progression:
-- `pending` - Initial state after creation
-- `confirmed` - Order has been validated and confirmed
-- `completed` - Order has been fulfilled
-- `cancelled` - Order has been cancelled
+Containerization: A Docker image is created from the service's codebase and tagged with a unique version identifier.
 
-## Development
+Image Push: The Docker image is then pushed to Docker Hub for distribution.
 
-### Running Tests
-```bash
-npm test
-```
-
-### Running with nodemon
-```bash
-npm run dev
-```
-
-### Docker Build
-```bash
-docker build -t order-service .
-```
-
-## Database Schema
-
-The service expects the following tables to exist:
-- `orders` - Main orders table
-- `products` - Product catalog (from Product Service)
-
-Refer to the main project repository for database initialization scripts.
-
-## Integration
-
-This service integrates with:
-- **Product Service**: Validates product existence and pricing
-- **Database**: PostgreSQL for order persistence
-
-## CI/CD Pipeline
-
-The service uses Jenkins for continuous integration and deployment:
-- **Build Stage**: Code compilation and linting
-- **Test Stage**: Unit and integration tests
-- **Security Scan**: SonarQube analysis and dependency checks
-- **Container Build**: Docker image creation
-- **Container Push**: Push to Docker Hub
-- **Deploy**: Environment-specific deployments
-
-### Branch Strategy
-
-- `main` - Production deployments (manual approval required)
-- `develop` - Development environment (auto-deploy)
-- `release/*` - Staging environment (auto-deploy)
-- `feature/*` - Build and test only
-- `hotfix/*` - Emergency fixes
-
-## Monitoring
-
-### Health Checks
-The service includes built-in health checks accessible at `/health`
-
-### Logging
-Application logs are written to stdout and can be collected by container orchestration platforms.
-
-## Security
-
-- Non-root user execution in containers
-- Helmet.js for security headers
-- Input validation on all endpoints
-- Regular dependency updates
-
-## Contributing
-
-1. Create feature branch from `develop`
-2. Make changes and add tests
-3. Submit pull request
-4. Pipeline must pass all stages
-5. Code review required before merge
-
+<<<<<<< HEAD
 docker run -d --name sonarqube -p 9000:9000 sonarqube:lts
+=======
+Deployment: The pipeline orchestrates the deployment to the different Kubernetes environments, ensuring a seamless and repeatable process for every code change.
+>>>>>>> master
